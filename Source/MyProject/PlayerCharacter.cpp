@@ -11,8 +11,11 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &APlayerCharacter::Interact);	
+	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &APlayerCharacter::Interact);
+	PlayerInputComponent->BindAction("ItemDragModifier", IE_Pressed, this, &APlayerCharacter::ModifyItemDrag);
+	PlayerInputComponent->BindAction("ItemDragModifier", IE_Released, this, &APlayerCharacter::StopModifyItemDrag);
 }
+
 
 void APlayerCharacter::Interact()
 {
@@ -34,5 +37,15 @@ void APlayerCharacter::Interact()
 			}
 		}
 	}
+}
+
+void APlayerCharacter::ModifyItemDrag()
+{
+	bModifyItemDrag = true;
+}
+
+void APlayerCharacter::StopModifyItemDrag()
+{
+	bModifyItemDrag = false;
 }
 

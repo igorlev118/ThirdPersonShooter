@@ -261,5 +261,52 @@ void AInventory::UsingItemAtSlot(int32 Index)
 	}
 }
 
+bool AInventory::AddToIndex(int32 IndexFrom, int32 IndexTo)
+{		
+	if (InventorySlots[IndexFrom].ItemClass == InventorySlots[IndexTo].ItemClass && InventorySlots[IndexTo].Amount < MaxStackSize && InventorySlots[IndexFrom].ItemClass.GetDefaultObject()->ItemInfo.bCanBeStacked)
+	{
+		if (GetAmountAtIndex(IndexTo) + GetAmountAtIndex(IndexFrom) <= MaxStackSize)
+		{
+			InventorySlots[IndexTo].Amount = GetAmountAtIndex(IndexFrom) + GetAmountAtIndex(IndexTo);
+			InventorySlots[IndexFrom].ItemClass = nullptr;
+			InventorySlots[IndexFrom].Amount = 0;
+			OnUpdateSpecificSlot(IndexFrom);
+			OnUpdateSpecificSlot(IndexTo);
+			return true;
+		}
+		else
+		{
+			InventorySlots[IndexFrom].Amount = GetAmountAtIndex(IndexFrom) - (MaxStackSize - GetAmountAtIndex(IndexTo));
+			InventorySlots[IndexTo].Amount = MaxStackSize;
+			OnUpdateSpecificSlot(IndexFrom);
+			OnUpdateSpecificSlot(IndexTo);
+			return true;
+		}
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool AInventory::SplitStackToIndex(int32 IndexFrom, int32 IndexTo, int32 Amount)
+{
+	if (IsSLotEmpty(IndexTo) && !IsSLotEmpty(IndexFrom) 
+		&& InventorySlots[IndexFrom].ItemClass.GetDefaultObject()->ItemInfo.bCanBeStacked 
+		&& InventorySlots[IndexFrom].Amount > 1 && InventorySlots[IndexFrom].Amount > Amount)
+	{
+		InventorySlots[IndexFrom].Amount -= Amount;
+		InventorySlots[IndexTo].Amount = Amount;
+		InventorySlots[IndexTo].ItemClass = InventorySlots[IndexFrom].ItemClass;
+		OnUpdateSpecificSlot(IndexFrom);
+		OnUpdateSpecificSlot(IndexTo);
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 
 

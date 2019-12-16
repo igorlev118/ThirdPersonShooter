@@ -121,4 +121,18 @@ public:
 	*/
 	UFUNCTION(BlueprintCallable)
 	void UsingItemAtSlot(int32 Index);
+
+	/**
+	 * Can be used to add the amount of one item to the amount of another one
+	 * will only return success if both items are of the same class
+	 */
+	UFUNCTION(BlueprintCallable)
+	bool AddToIndex(int32 IndexFrom, int32 IndexTo);
+
+	/**
+	 * Can be used to split the amount of a stack-able item
+	 * to another empty slot
+	 */
+	UFUNCTION(BlueprintCallable)
+	bool SplitStackToIndex(int32 IndexFrom, int32 IndexTo, int32 Amount);
 };

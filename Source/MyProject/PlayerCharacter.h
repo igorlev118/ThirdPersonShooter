@@ -16,8 +16,21 @@ class MYPROJECT_API APlayerCharacter : public AMyProjectCharacter
 
 	void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
+private:
+
+	bool bModifyItemDrag;
+
 public:
 
-	void Interact();	
-	class APickup* FoundPickup = nullptr;	
+	// Methods
+	void Interact();
+	void ModifyItemDrag();
+	void StopModifyItemDrag();
+
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE bool GetModifyItemDrag() { return bModifyItemDrag; }
+
+	// public properties
+	class APickup* FoundPickup = nullptr;
+	
 };
