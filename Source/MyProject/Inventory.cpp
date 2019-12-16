@@ -65,9 +65,7 @@ bool AInventory::SearchFreeStack(int32& Index, TSubclassOf<AItemBase> Item)
 
 	return false;
 }
-/**
- * This is the main to add any item to the players inventory
- */
+
 bool AInventory::AddItem(TSubclassOf<AItemBase> Item, FName DatabaseKey, int32 Amount, int32& Rest)
 {
 	AMyProjectGameMode* GameMode = Cast<AMyProjectGameMode>(GetWorld()->GetAuthGameMode());
@@ -173,6 +171,7 @@ bool AInventory::AddItem(TSubclassOf<AItemBase> Item, FName DatabaseKey, int32 A
 	}
 }
 
+
 bool AInventory::RemoveItemAtIndex(int32 Index, int32 Amount)
 {
 	// When the slot is empty, there is no operation
@@ -201,6 +200,7 @@ bool AInventory::RemoveItemAtIndex(int32 Index, int32 Amount)
 	return false;
 }
 
+
 int32 AInventory::GetAmountAtIndex(int32 Index)
 {
 	return InventorySlots[Index].Amount;
@@ -224,6 +224,7 @@ bool AInventory::SwapSlots(int32 IndexA, int32 IndexB)
 	return true;
 }
 
+
 bool AInventory::SplitStack(int32 Index, int32 Amount)
 {
 	// if the slot is empty, the amount in the slot smaller than the existing amount or the item is not stackable
@@ -245,6 +246,7 @@ bool AInventory::SplitStack(int32 Index, int32 Amount)
 	OnUpdateSpecificSlot(EmptyIndex);
 	return true;
 }
+
 
 void AInventory::UsingItemAtSlot(int32 Index)
 {

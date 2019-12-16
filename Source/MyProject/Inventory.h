@@ -54,6 +54,7 @@ protected:
 
 public:
 
+
 	// Events
 
 	UFUNCTION(BlueprintImplementableEvent)
@@ -61,31 +62,63 @@ public:
 
 	// Functions
 
+	/**
+	 * Returns true if the chosen index does not contain an item
+	 */
 	UFUNCTION(BlueprintCallable)
 	bool IsSLotEmpty(int32 Index);
 
+	/**
+	 * Returns all necessary information for further operation of an item at a chosen index
+	 * Returns true if an item was found
+	 */
 	UFUNCTION(BlueprintCallable)
 	bool GetItemInfoAtIndex(int32 Index, int32& ItemAmount, FItemInfo& ItemInfo);
-		
+
+	/**
+	 * Finds the next empty slot in the inventory container
+	 */
 	bool SearchEmptySlot(int32& Index);	
-	
+
+	/**
+	 * Checks whether there is a free stack of items of a certain amount and returns the success and the index
+	 */
 	bool SearchFreeStack(int32& Index, TSubclassOf<AItemBase> Item);
 
+	/**
+	* This is the main to add any item to the players inventory
+	*/
 	UFUNCTION(BlueprintCallable)
 	bool AddItem(TSubclassOf<AItemBase> Item, FName DatabaseKey, int32 Amount, int32& Rest);
 
+	/**
+	* Can delete an item at a given position with a certain amount
+	*/
 	UFUNCTION(BlueprintCallable)
 	bool RemoveItemAtIndex(int32 Index, int32 Amount);
 
+	/**
+	* Returns the amount of items at given index
+	*/
 	UFUNCTION(BlueprintCallable)
 	int32 GetAmountAtIndex(int32 Index);
 
+	/**
+	 * Swaps two inventory slots.
+	 * Is protected against false index inputs
+	 */
 	UFUNCTION(BlueprintCallable)
 	bool SwapSlots(int32 IndexA, int32 IndexB);
 
+	/**
+	* Can split a stack of stackable items, does nothing if there is no stack or if the item is not stackable
+	*/
 	UFUNCTION(BlueprintCallable)
 	bool SplitStack (int32 Index, int32 Amount);
 
+	/**
+	* Calls the on use function of the item at a given slot. Note that the use is determined by the item
+	*/
 	UFUNCTION(BlueprintCallable)
 	void UsingItemAtSlot(int32 Index);
 };

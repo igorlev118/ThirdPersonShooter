@@ -16,7 +16,7 @@ public:
 	APickup();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Carried Item")
-		FName DatabaseKey;
+	FName DatabaseKey;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Carried Item")
 	TSubclassOf<class AItemBase> ItemToAdd;	
@@ -37,4 +37,7 @@ protected:
 	UFUNCTION()
 	void OnOverlapse(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);	
 
+	UFUNCTION()
+	void EndOverlapse(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 };
+

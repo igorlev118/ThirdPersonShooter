@@ -18,8 +18,6 @@ class MYPROJECT_API APlayerCharacter : public AMyProjectCharacter
 
 public:
 
-	void Interact();
-	void DoesNotInteract();
-
-	bool bIsInteracting;
+	void Interact();	
+	class APickup* FoundPickup = nullptr;	
 };

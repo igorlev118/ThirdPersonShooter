@@ -22,6 +22,7 @@ void APickup::BeginPlay()
 {
 	Super::BeginPlay();
 	SphereCollider->OnComponentBeginOverlap.AddDynamic(this, &APickup::OnOverlapse);
+	SphereCollider->OnComponentEndOverlap.AddDynamic(this, &APickup::EndOverlapse);
 
 }
 
@@ -31,26 +32,23 @@ void APickup::OnOverlapse(UPrimitiveComponent* OverlappedComp, AActor* OtherActo
 	if (Player && OtherActor && OtherActor != this && OtherComp)
 	{
 		
-		if (Player->bIsInteracting)
+		if (Player)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("report"))
-			ACustomCharacterController* Controller = Cast<ACustomCharacterController>(Player->GetController());
-			if (Controller->InventoryReference)
-			{
-				int32 PotentialRest = 0;
-				bool bIsItemAdded = Controller->InventoryReference->AddItem(ItemToAdd, DatabaseKey, Amount, PotentialRest);
-
-				if (bIsItemAdded && PotentialRest > 0)
-				{
-					Amount = PotentialRest;
-				}
-				else
-				{
-					Destroy();
-				}
-			}
+			Player->FoundPickup = this;
+			
 		}
 		
 	}
 }
+
+void APickup::EndOverlapse(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	APlayerCharacter* Player = Cast<APlayerCharacter>(OtherActor);
+	if (Player && OtherActor && OtherActor != this && OtherComp)
+	{
+		Player->FoundPickup = nullptr;
+	}
+}
+
 
