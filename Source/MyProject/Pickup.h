@@ -16,7 +16,7 @@ public:
 	APickup();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Carried Item")
-	TSubclassOf<class AItemBase> ItemToAdd;
+	TSubclassOf<class AItemBase> ItemToAdd;	
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Carried Item")
 	int32 Amount;

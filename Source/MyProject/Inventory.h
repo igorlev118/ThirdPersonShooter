@@ -42,7 +42,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 		TArray<FInventorySlot> InventorySlots;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int32 AmountOfSlots = 20;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
@@ -56,9 +56,11 @@ public:
 	
 
 	// Functions
-	
+
+	UFUNCTION(BlueprintCallable)
 	bool IsSLotEmpty(int32 Index);
-	
+
+	UFUNCTION(BlueprintCallable)
 	bool GetItemInfoAtIndex(int32 Index, int32& ItemAmount, FItemInfo& ItemInfo);
 		
 	bool SearchEmptySlot(int32& Index);	

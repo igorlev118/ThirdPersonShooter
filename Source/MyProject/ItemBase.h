@@ -7,6 +7,7 @@
 #include "GameFramework/Actor.h"
 #include "ItemBase.generated.h"
 
+
 UCLASS()
 class MYPROJECT_API AItemBase : public AActor
 {
@@ -19,8 +20,8 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-public:	
+	
+public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FItemInfo ItemInfo;
