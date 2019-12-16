@@ -2,6 +2,7 @@
 
 #include "ItemBase.h"
 #include "Engine/World.h"
+#include "Inventory.h"
 
 // Sets default values
 AItemBase::AItemBase() : Super()
@@ -13,6 +14,17 @@ void AItemBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
+}
+
+void AItemBase::OnUse_Implementation()
+{
+	if (Inventory->RemoveItemAtIndex(Index, 1))
+	{
+		if (ItemInfo.Category != EItemCategory::IC_QUESTITEM)
+		{
+			Destroy();
+		}		
+	}	
 }
 
 

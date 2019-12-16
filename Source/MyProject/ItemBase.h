@@ -22,13 +22,18 @@ protected:
 	virtual void BeginPlay() override;
 	
 public:
-	
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 Index;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	AInventory* Inventory;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName DatabaseID;
 
 	FItemInfo ItemInfo;
 
-	UFUNCTION(BlueprintImplementableEvent)
+	UFUNCTION(BlueprintNativeEvent)
 	void OnUse();
-
 };

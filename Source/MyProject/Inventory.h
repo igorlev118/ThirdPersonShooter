@@ -16,6 +16,7 @@ struct FInventorySlot : public FTableRowBase
 	FInventorySlot()
 	{
 		Amount = 0;
+		ItemClass = nullptr;
 	}
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -53,8 +54,10 @@ protected:
 
 public:
 
+	// Events
+
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnUpdateSpecificSlot(int32 Index);
+	void OnUpdateSpecificSlot(int32 Index);	
 
 	// Functions
 
@@ -71,5 +74,18 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool AddItem(TSubclassOf<AItemBase> Item, FName DatabaseKey, int32 Amount, int32& Rest);
 
+	UFUNCTION(BlueprintCallable)
+	bool RemoveItemAtIndex(int32 Index, int32 Amount);
+
+	UFUNCTION(BlueprintCallable)
 	int32 GetAmountAtIndex(int32 Index);
+
+	UFUNCTION(BlueprintCallable)
+	bool SwapSlots(int32 IndexA, int32 IndexB);
+
+	UFUNCTION(BlueprintCallable)
+	bool SplitStack (int32 Index, int32 Amount);
+
+	UFUNCTION(BlueprintCallable)
+	void UsingItemAtSlot(int32 Index);
 };

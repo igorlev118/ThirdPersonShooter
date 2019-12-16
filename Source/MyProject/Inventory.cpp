@@ -173,9 +173,90 @@ bool AInventory::AddItem(TSubclassOf<AItemBase> Item, FName DatabaseKey, int32 A
 	}
 }
 
+bool AInventory::RemoveItemAtIndex(int32 Index, int32 Amount)
+{
+	// When the slot is empty, there is no operation
+	if (IsSLotEmpty(Index) && Amount < 1)
+	{
+		return false;
+	}
+
+	// When the amount to remove is higher 
+	if (Amount >= GetAmountAtIndex(Index))
+	{
+		InventorySlots[Index].Amount = 0;
+		InventorySlots[Index].ItemClass = nullptr;
+		OnUpdateSpecificSlot(Index);
+		return true;
+	}
+
+	// When the amount to remove is less than the amount in the slot, leave the rest value
+	else
+	{
+		InventorySlots[Index].Amount -= Amount;
+		OnUpdateSpecificSlot(Index);
+		return true;
+	}
+
+	return false;
+}
+
 int32 AInventory::GetAmountAtIndex(int32 Index)
 {
 	return InventorySlots[Index].Amount;
+}
+
+bool AInventory::SwapSlots(int32 IndexA, int32 IndexB)
+{
+	// if any of the given indices is bigger than the length of the array it must be out of bound
+	if (InventorySlots.Num() < IndexA || InventorySlots.Num() < IndexB)
+	{
+		return false;
+	}
+
+	// swap both slots
+	FInventorySlot Temp = InventorySlots[IndexA];
+	InventorySlots[IndexA] = InventorySlots[IndexB];
+	InventorySlots[IndexB] = Temp;
+	OnUpdateSpecificSlot(IndexA);
+	OnUpdateSpecificSlot(IndexB);
+
+	return true;
+}
+
+bool AInventory::SplitStack(int32 Index, int32 Amount)
+{
+	// if the slot is empty, the amount in the slot smaller than the existing amount or the item is not stackable
+	// this means there can't be a split operation
+	if (IsSLotEmpty(Index) || InventorySlots[Index].Amount <= Amount || !InventorySlots[Index].ItemClass.GetDefaultObject()->ItemInfo.bCanBeStacked)
+	{
+		return false;
+	}
+
+	int32 EmptyIndex;
+	if (!SearchEmptySlot(EmptyIndex))
+	{
+		return false;
+	}
+	InventorySlots[EmptyIndex].ItemClass = InventorySlots[Index].ItemClass;
+	InventorySlots[EmptyIndex].Amount = Amount;
+	InventorySlots[Index].Amount -= Amount;
+	OnUpdateSpecificSlot(Index);
+	OnUpdateSpecificSlot(EmptyIndex);
+	return true;
+}
+
+void AInventory::UsingItemAtSlot(int32 Index)
+{
+	if(IsValid(InventorySlots[Index].ItemClass))
+	{
+		FActorSpawnParameters SpawnParameters;
+		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		AItemBase* Item = GetWorld()->SpawnActor<AItemBase>(InventorySlots[Index].ItemClass, SpawnParameters);
+		Item->Index = Index;
+		Item->Inventory = this;
+		Item->OnUse();
+	}
 }
 
 
