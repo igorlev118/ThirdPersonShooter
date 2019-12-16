@@ -4,7 +4,7 @@
 #include "Engine/World.h"
 
 // Sets default values
-AItemBase::AItemBase()
+AItemBase::AItemBase() : Super()
 { 		
 }
 

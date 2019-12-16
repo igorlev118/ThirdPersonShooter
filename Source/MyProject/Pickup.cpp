@@ -38,7 +38,7 @@ void APickup::OnOverlapse(UPrimitiveComponent* OverlappedComp, AActor* OtherActo
 			if (Controller->InventoryReference)
 			{
 				int32 PotentialRest = 0;
-				bool bIsItemAdded = Controller->InventoryReference->AddItem(ItemToAdd, Amount, PotentialRest);
+				bool bIsItemAdded = Controller->InventoryReference->AddItem(ItemToAdd, DatabaseKey, Amount, PotentialRest);
 
 				if (bIsItemAdded && PotentialRest > 0)
 				{

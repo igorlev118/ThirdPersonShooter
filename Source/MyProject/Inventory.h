@@ -49,11 +49,12 @@ protected:
 		int32 MaxStackSize = 50;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-		class APlayerCharacter* Player;
+		class APlayerCharacter* Player;	
 
 public:
 
-	
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnUpdateSpecificSlot(int32 Index);
 
 	// Functions
 
@@ -68,7 +69,7 @@ public:
 	bool SearchFreeStack(int32& Index, TSubclassOf<AItemBase> Item);
 
 	UFUNCTION(BlueprintCallable)
-	bool AddItem(TSubclassOf<AItemBase> Item, int32 Amount, int32& Rest);
+	bool AddItem(TSubclassOf<AItemBase> Item, FName DatabaseKey, int32 Amount, int32& Rest);
 
 	int32 GetAmountAtIndex(int32 Index);
 };

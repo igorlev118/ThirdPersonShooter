@@ -6,5 +6,5 @@
 
 void ACustomCharacterController::BeginPlay()
 {
-	InventoryReference = Cast<AInventory>(GetWorld()->SpawnActor(Inventory));	
+	Super::BeginPlay();		
 }
