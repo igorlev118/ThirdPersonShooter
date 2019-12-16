@@ -24,6 +24,8 @@ protected:
 public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName DatabaseID;
+
 	FItemInfo ItemInfo;
 
 	UFUNCTION(BlueprintImplementableEvent)
