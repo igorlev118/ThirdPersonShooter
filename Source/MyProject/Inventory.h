@@ -50,7 +50,14 @@ protected:
 		int32 MaxStackSize = 50;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-		class APlayerCharacter* Player;	
+		class APlayerCharacter* Player;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+		bool bShowObtainedItem;
+
+	// Internal methods
+	UFUNCTION(BlueprintCallable)
+		bool AddItemInsideClass(TSubclassOf<AItemBase> Item, FName DatabaseKey, int32 Amount, int32& Rest);
 
 public:
 
@@ -58,7 +65,13 @@ public:
 	// Events
 
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnUpdateSpecificSlot(int32 Index);	
+	void OnUpdateSpecificSlot(int32 Index);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	bool ShowObtainedItem(TSubclassOf<AItemBase> Item, int32 Amount);
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	bool AddItem(TSubclassOf<AItemBase> Item, FName DatabaseKey, int32 Amount, int32& Rest);
 
 	// Functions
 
@@ -83,13 +96,7 @@ public:
 	/**
 	 * Checks whether there is a free stack of items of a certain amount and returns the success and the index
 	 */
-	bool SearchFreeStack(int32& Index, TSubclassOf<AItemBase> Item);
-
-	/**
-	* This is the main to add any item to the players inventory
-	*/
-	UFUNCTION(BlueprintCallable)
-	bool AddItem(TSubclassOf<AItemBase> Item, FName DatabaseKey, int32 Amount, int32& Rest);
+	bool SearchFreeStack(int32& Index, TSubclassOf<AItemBase> Item);	
 
 	/**
 	* Can delete an item at a given position with a certain amount
@@ -134,5 +141,5 @@ public:
 	 * to another empty slot
 	 */
 	UFUNCTION(BlueprintCallable)
-	bool SplitStackToIndex(int32 IndexFrom, int32 IndexTo, int32 Amount);
+	bool SplitStackToIndex(int32 IndexFrom, int32 IndexTo, int32 Amount);	
 };

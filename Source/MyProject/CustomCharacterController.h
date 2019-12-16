@@ -17,6 +17,16 @@ enum class EItemCategory : uint8
 	IC_QUESTITEM UMETA(DisplayName = "Quest Item")
 };
 
+UENUM(BlueprintType)
+enum class EItemRarity : uint8
+{
+	IR_NONE UMETA(DisplayName = "This is only a default"),
+	IR_COMMON UMETA(DisplayName = "Common"),
+	IR_RARE  UMETA(DisplayName = "Rare"),
+	IR_EPIC UMETA(DisplayName = "Epic"),
+	IR_LEGENDARY UMETA(DisplayName = "Legendary")
+};
+
 USTRUCT(BlueprintType)
 struct FItemInfo : public FTableRowBase
 {
@@ -29,6 +39,7 @@ struct FItemInfo : public FTableRowBase
 		Use = FText::FromString(TEXT("Enter an Item usage"));
 		Icon = nullptr;
 		Category = EItemCategory::IC_NONE;
+		Rarity = EItemRarity::IR_NONE;
 	}
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -51,6 +62,9 @@ struct FItemInfo : public FTableRowBase
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		EItemCategory Category;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		EItemRarity Rarity;
 
 };
 

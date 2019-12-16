@@ -19,6 +19,111 @@ void AInventory::BeginPlay()
 	InventorySlots.SetNum(AmountOfSlots);
 }
 
+bool AInventory::AddItemInsideClass(TSubclassOf<AItemBase> Item, FName DatabaseKey, int32 Amount, int32& Rest)
+{
+	AMyProjectGameMode* GameMode = Cast<AMyProjectGameMode>(GetWorld()->GetAuthGameMode());
+	UDataTable* InitData = GameMode->ItemDataBase;
+	FItemInfo* Setup = InitData->FindRow<FItemInfo>(DatabaseKey, TEXT(""));
+
+	Item.GetDefaultObject()->ItemInfo = *Setup;
+
+	// case that item is NOT stackable
+	if (!Item.GetDefaultObject()->ItemInfo.bCanBeStacked)
+	{
+		int32 Index = 0;
+		if (SearchEmptySlot(Index))
+		{
+			FInventorySlot ItemToAdd;
+			ItemToAdd.ItemClass = Item;
+			ItemToAdd.Amount = 1;
+			InventorySlots[Index] = ItemToAdd;
+			OnUpdateSpecificSlot(Index);
+			int32 LocalAmount = Amount;
+			LocalAmount -= 1;
+			if (LocalAmount > 0)
+			{
+				int32 Remainder = LocalAmount;
+				AddItem(Item, DatabaseKey, LocalAmount, Remainder);
+				return true;
+			}
+			return true;
+		}
+
+		Rest = Amount;
+		return false;
+
+	}
+
+	// case for stackable Items
+	else
+	{
+		int32 Index = 0;
+		if (SearchFreeStack(Index, Item))
+		{
+			// case that the amount already inside the slot and the amount to added exceed the allowed stack size
+			if (InventorySlots[Index].Amount + Amount > MaxStackSize)
+			{
+				FInventorySlot ItemToAdd;
+				ItemToAdd.ItemClass = Item;
+				ItemToAdd.Amount = MaxStackSize;
+				int32 LeftOver = InventorySlots[Index].Amount + Amount - MaxStackSize;
+				int32 RestAmount = InventorySlots[Index].Amount + Amount - MaxStackSize;
+				InventorySlots[Index] = ItemToAdd;
+				OnUpdateSpecificSlot(Index);
+				AddItem(Item, DatabaseKey, LeftOver, RestAmount);
+				return true;
+			}
+			// case that existing amount and amount to be added are not exceeding the aloowed stack size
+			else
+			{
+				FInventorySlot ItemToAdd;
+				ItemToAdd.ItemClass = Item;
+				ItemToAdd.Amount = InventorySlots[Index].Amount + Amount;
+				InventorySlots[Index] = ItemToAdd;
+				OnUpdateSpecificSlot(Index);
+				return true;
+			}
+
+		}
+		else
+		{
+			int32 Index = 0;
+			if (SearchEmptySlot(Index))
+			{
+				FInventorySlot ItemToAdd;
+				ItemToAdd.ItemClass = Item;
+
+				// if amount to add is bigger than the alowed stack size, add the rest in a separate call
+				if (Amount > MaxStackSize)
+				{
+					ItemToAdd.Amount = MaxStackSize;
+					InventorySlots.Insert(ItemToAdd, Index);
+					int32 LeftOver = MaxStackSize - Amount;
+					int32 RestAmount = MaxStackSize - Amount;
+					AddItem(Item, DatabaseKey, LeftOver, RestAmount);
+					return true;
+				}
+				else
+				{
+					ItemToAdd.Amount = Amount;
+					InventorySlots[Index] = ItemToAdd;
+					OnUpdateSpecificSlot(Index);
+					return true;
+				}
+
+
+			}
+			else
+			{
+				Rest = Amount;
+				return false; // Item cannot be added
+			}
+
+		}
+
+	}
+}
+
 bool AInventory::IsSLotEmpty(int32 Index)
 {	
 	return !IsValid(InventorySlots[Index].ItemClass);
@@ -66,110 +171,6 @@ bool AInventory::SearchFreeStack(int32& Index, TSubclassOf<AItemBase> Item)
 	return false;
 }
 
-bool AInventory::AddItem(TSubclassOf<AItemBase> Item, FName DatabaseKey, int32 Amount, int32& Rest)
-{
-	AMyProjectGameMode* GameMode = Cast<AMyProjectGameMode>(GetWorld()->GetAuthGameMode());
-	UDataTable* InitData = GameMode->ItemDataBase;
-	FItemInfo* Setup = InitData->FindRow<FItemInfo>(DatabaseKey, TEXT(""));
-
-	Item.GetDefaultObject()->ItemInfo = *Setup;
-
-	// case that item is NOT stackable
-	if (!Item.GetDefaultObject()->ItemInfo.bCanBeStacked)
-	{
-		int32 Index = 0;
-		if (SearchEmptySlot(Index))
-		{
-			FInventorySlot ItemToAdd;
-			ItemToAdd.ItemClass = Item;
-			ItemToAdd.Amount = 1;
-			InventorySlots[Index] = ItemToAdd;
-			OnUpdateSpecificSlot(Index);
-			int32 LocalAmount = Amount;
-			LocalAmount -= 1;
-			if (LocalAmount > 0)
-			{
-				int32 Remainder = LocalAmount;
-				AddItem(Item, DatabaseKey, LocalAmount, Remainder);
-				return true;
-			}
-			return true;
-		}
-
-		Rest = Amount;
-		return false;
-		
-	}	
-
-	// case for stackable Items
-	else
-	{
-		int32 Index = 0;
-		if (SearchFreeStack(Index, Item))
-		{
-			// case that the amount already inside the slot and the amount to added exceed the allowed stack size
-			if (InventorySlots[Index].Amount + Amount > MaxStackSize)
-			{
-				FInventorySlot ItemToAdd;
-				ItemToAdd.ItemClass = Item;
-				ItemToAdd.Amount = MaxStackSize;
-				int32 LeftOver = InventorySlots[Index].Amount + Amount - MaxStackSize;
-				int32 RestAmount = InventorySlots[Index].Amount + Amount - MaxStackSize;
-				InventorySlots[Index] = ItemToAdd;			
-				OnUpdateSpecificSlot(Index);
-				AddItem(Item, DatabaseKey, LeftOver, RestAmount);
-				return true;
-			}
-			// case that existing amount and amount to be added are not exceeding the aloowed stack size
-			else
-			{
-				FInventorySlot ItemToAdd;
-				ItemToAdd.ItemClass = Item;
-				ItemToAdd.Amount = InventorySlots[Index].Amount + Amount;
-				InventorySlots[Index] = ItemToAdd;
-				OnUpdateSpecificSlot(Index);
-				return true;
-			}
-			
-		}
-		else
-		{
-			int32 Index = 0;
-			if (SearchEmptySlot(Index))
-			{
-				FInventorySlot ItemToAdd;
-				ItemToAdd.ItemClass = Item;
-
-				// if amount to add is bigger than the alowed stack size, add the rest in a separate call
-				if (Amount > MaxStackSize)
-				{
-					ItemToAdd.Amount = MaxStackSize;
-					InventorySlots.Insert(ItemToAdd, Index);
-					int32 LeftOver = MaxStackSize - Amount;
-					int32 RestAmount = MaxStackSize - Amount;
-					AddItem(Item, DatabaseKey, LeftOver, RestAmount);
-					return true;
-				}
-				else
-				{
-					ItemToAdd.Amount = Amount;
-					InventorySlots[Index] = ItemToAdd;
-					OnUpdateSpecificSlot(Index);
-					return true;
-				}
-
-
-			}
-			else
-			{
-				Rest = Amount;
-				return false; // Item cannot be added
-			}
-
-		}
-		
-	}
-}
 
 
 bool AInventory::RemoveItemAtIndex(int32 Index, int32 Amount)
