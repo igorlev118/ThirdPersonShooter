@@ -17,19 +17,37 @@ public:
 	AAICharacter();
 
 protected:
+
+	// Methods
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	void ResetWidgetTimer();
+
+	// Attributes
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	USkeletalMeshComponent* Weapon;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	class UWidgetComponent* HealthBarWidget;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	class UPatrolRouteComponent* PatrolRoute;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Setup")
 	float MaxHealth = 200;
 
-	float CurrentHealth;	
+	/*
+	 * Time in seconds when the HP widget gets hidden after the last taken damage
+	 */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Setup")
+	float WidgetTimer = 15;
+
+	float CurrentHealth;
+
+	float HealthBuffer;
+
+	FTimerHandle WidgetTimerHandle;	
 
 public:	
 	// Called every frame
@@ -38,15 +56,18 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	void ITakeDamage(FName Bone, float Damage, float HeadShotMultiplier) override;
+	void ITakeDamage(FName Bone, float Damage, float HeadShotMultiplier) override;	
 
 	UFUNCTION(BlueprintCallable)
-	bool IsDead();
+	bool IsDead() const;
+	
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE float GetCurrentHealth() const { return CurrentHealth; }
 
 	UFUNCTION(BlueprintCallable)
-	FORCEINLINE float GetCurrentHealth() { return CurrentHealth; }
+	FORCEINLINE float GetHealthBuffer() const { return HealthBuffer; }
 
 	UFUNCTION(BlueprintCallable)
-	FORCEINLINE float GetMaxHealth() { return MaxHealth; }
-
+	FORCEINLINE float GetMaxHealth() const { return MaxHealth; }
+	
 };

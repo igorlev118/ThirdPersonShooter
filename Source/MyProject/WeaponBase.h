@@ -141,5 +141,5 @@ public:
 	void ResetShotCounter();
 	void ResetAnim();
 	
-	FORCEINLINE uint8 GetShotCounter() { return ShotCounter; }
+	FORCEINLINE uint8 GetShotCounter() const { return ShotCounter; }
 };

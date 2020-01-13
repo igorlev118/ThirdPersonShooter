@@ -142,40 +142,40 @@ public:
 
 	// getters
 	UFUNCTION(BlueprintCallable)
-	FORCEINLINE bool GetModifyItemDrag() { return bModifyItemDrag; }
+	FORCEINLINE bool GetModifyItemDrag() const { return bModifyItemDrag; }
 
 	UFUNCTION(BlueprintCallable)
-	FORCEINLINE bool GetIsSprinting() { return bIsSprinting; }
+	FORCEINLINE bool GetIsSprinting() const { return bIsSprinting; }
 
 	UFUNCTION(BlueprintCallable)
-	FORCEINLINE bool GetIsMainWeaponEquipped() { return bIsMainWeaponEquipped; }
+	FORCEINLINE bool GetIsMainWeaponEquipped() const { return bIsMainWeaponEquipped; }
 
 	UFUNCTION(BlueprintCallable)
-	FORCEINLINE bool GetIsSecondaryWeaponEquipped() { return bIsSecondaryWeaponEquipped; }
+	FORCEINLINE bool GetIsSecondaryWeaponEquipped() const { return bIsSecondaryWeaponEquipped; }
 
 	UFUNCTION(BlueprintCallable)
-	FORCEINLINE float GetHealth() { return Health; }
+	FORCEINLINE float GetHealth() const { return Health; }
 
 	UFUNCTION(BlueprintCallable)
-	FORCEINLINE float GetMaxHealth() { return MaxHealth; }
+	FORCEINLINE float GetMaxHealth() const { return MaxHealth; }
 
 	UFUNCTION(BlueprintCallable)
-	FORCEINLINE int32 GetLevel() { return Level; }
+	FORCEINLINE int32 GetLevel() const { return Level; }
 
 	UFUNCTION(BlueprintCallable)
-	FORCEINLINE float GetExp() { return GatheredExp; }
+	FORCEINLINE float GetExp() const { return GatheredExp; }
 
 	UFUNCTION(BlueprintCallable)
-	FORCEINLINE float GetNeededExp() { return NeededExpForNextLevel; }
+	FORCEINLINE float GetNeededExp() const { return NeededExpForNextLevel; }
 
 	UFUNCTION(BlueprintCallable)
-	FORCEINLINE bool GetIsAiming() { return bIsAiming; }
+	FORCEINLINE bool GetIsAiming() const { return bIsAiming; }
 
 	UFUNCTION(BlueprintCallable)
-	FORCEINLINE bool GetIsCrouched() { return bIsCrouched; }
+	FORCEINLINE bool GetIsCrouched() const { return bIsCrouched; }
 
 	UFUNCTION(BlueprintCallable)
-	FORCEINLINE UCameraComponent* GetAimCamera() { return AimCamera; }
+	FORCEINLINE UCameraComponent* GetAimCamera() const { return AimCamera; }
 	
 	// public properties
 	class APickup* FoundPickup = nullptr;	
