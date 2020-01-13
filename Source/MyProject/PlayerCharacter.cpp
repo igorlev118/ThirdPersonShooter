@@ -10,12 +10,23 @@
 #include "Engine/World.h"
 #include "TimerManager.h"
 #include "WeaponBase.h"
+#include "Camera/CameraComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 
 
 APlayerCharacter::APlayerCharacter() : Super()
 {
 	GetCharacterMovement()->MaxWalkSpeed = Walkspeed;
-	Health = MaxHealth;	
+	Health = MaxHealth;
+
+	AimCameraArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("AimCameraArm"));
+	AimCameraArm->TargetArmLength = 10;
+	AimCameraArm->SetupAttachment(RootComponent);
+		
+	AimCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("AimCamera"));	
+	AimCamera->SetupAttachment(AimCameraArm);
+
+	
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) 
@@ -35,6 +46,10 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 	// Combat
 	PlayerInputComponent->BindAction("EquipWeapon", IE_Pressed, this, &APlayerCharacter::EquipAttachedWeapon);
+	PlayerInputComponent->BindAction("TakeAim", IE_Pressed, this, &APlayerCharacter::Takeaim);
+	PlayerInputComponent->BindAction("LoseAim", IE_Released, this, &APlayerCharacter::LoseAim);
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APlayerCharacter::Fire);
+	PlayerInputComponent->BindAction("Fire", IE_Released, this, &APlayerCharacter::StopFire);
 }
 
 void APlayerCharacter::Tick(float DeltaSeconds)
@@ -56,6 +71,7 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 
 void APlayerCharacter::Sprint()
 {
+	if (bIsAiming) { return; }
 	bIsSprinting = true;
 	
 }
@@ -73,13 +89,59 @@ void APlayerCharacter::ResetEquipWeapon()
 	GetWorld()->GetTimerManager().ClearTimer(AnimationPlaytime);
 }
 
+void APlayerCharacter::BeginPlay() 
+{	
+	Super::BeginPlay();
+	InitialRotation = GetActorRotation();
+}
+
 
 void APlayerCharacter::EquipAttachedWeapon()
 {
-	if (!MainWeapon && !SecondaryWeapon || bIsAnimationPlaying) { return; }
+	if (!MainWeapon && !SecondaryWeapon || bIsAnimationPlaying || bIsAiming) { return; }
 	bIsAnimationPlaying = true;
 	float AnimTime = PlayAnimMontage(EquipWeaponAnim);
 	GetWorld()->GetTimerManager().SetTimer(AnimationPlaytime, this, &APlayerCharacter::ResetEquipWeapon, AnimTime, true);
+}
+
+void APlayerCharacter::Takeaim()
+{
+	if (!CurrentlyEquippedWeapon) { return; }
+	GetFollowCamera()->SetActive(false, true);	
+	AimCamera->SetActive(true);	
+	bUseControllerRotationPitch = true;
+	bUseControllerRotationRoll = true;
+	bUseControllerRotationYaw = true;
+	
+	bIsAiming = true;
+}
+
+void APlayerCharacter::LoseAim()
+{
+	if (!CurrentlyEquippedWeapon || !bIsAiming) { return; }
+	GetFollowCamera()->SetActive(true);
+	AimCamera->SetActive(false, true);
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationRoll = false;
+	bUseControllerRotationYaw = false;
+	SetActorRotation(FRotator(InitialRotation.Pitch, GetActorRotation().Yaw, InitialRotation.Roll));
+	bIsAiming = false;
+}
+
+void APlayerCharacter::Fire()
+{
+	if (CurrentlyEquippedWeapon && bIsAiming)
+	{
+		CurrentlyEquippedWeapon->StartFire();
+	}
+}
+
+void APlayerCharacter::StopFire()
+{
+	if (CurrentlyEquippedWeapon && bIsAiming)
+	{		
+		CurrentlyEquippedWeapon->StopFire();
+	}
 }
 
 void APlayerCharacter::EquipAttachedWeaponForAnim()
@@ -134,8 +196,6 @@ void APlayerCharacter::EquipAttachedWeaponForAnim()
 			return;
 		}
 	}	
-
-
 }
 
 void APlayerCharacter::EquipWeapon(AWeaponBase* Weapon)
@@ -148,8 +208,7 @@ void APlayerCharacter::EquipWeapon(AWeaponBase* Weapon)
 		{
 			ACustomCharacterController* Controller = Cast<ACustomCharacterController>(GetController());
 			int32 Rest;
-			Controller->InventoryReference->AddItem(MainWeapon->InventoryItem, MainWeapon->DatabaseID, 1, Rest);
-			Controller->InventoryReference->AddItem
+			Controller->InventoryReference->AddItemInsideClass(MainWeapon->InventoryItem, MainWeapon->DatabaseID, 1, Rest);			
 			if (CurrentlyEquippedWeapon == MainWeapon)
 			{
 				CurrentlyEquippedWeapon = nullptr;
@@ -168,7 +227,7 @@ void APlayerCharacter::EquipWeapon(AWeaponBase* Weapon)
 		{
 			ACustomCharacterController* Controller = Cast<ACustomCharacterController>(GetController());
 			int32 Rest;
-			Controller->InventoryReference->AddItem(SecondaryWeapon->InventoryItem, SecondaryWeapon->DatabaseID, 1, Rest);
+			Controller->InventoryReference->AddItemInsideClass(SecondaryWeapon->InventoryItem, SecondaryWeapon->DatabaseID, 1, Rest);
 			if (CurrentlyEquippedWeapon == SecondaryWeapon)
 			{
 				CurrentlyEquippedWeapon = nullptr;

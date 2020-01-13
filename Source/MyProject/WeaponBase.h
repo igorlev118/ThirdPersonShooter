@@ -28,6 +28,7 @@ struct FWeaponStats : public FTableRowBase
 		MinSpread = 0;
 		MaxSpread = 0;
 		MagazineSize = 30;
+		MaxAmmo = 0;
 		Category = EWeaponCategory::WC_NONE;
 	}
 
@@ -53,6 +54,9 @@ struct FWeaponStats : public FTableRowBase
 	int32 MagazineSize;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	int32 MaxAmmo;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	EWeaponCategory Category;
 };
 
@@ -62,19 +66,33 @@ class MYPROJECT_API AWeaponBase : public AItemBase
 	GENERATED_BODY()
 
 	AWeaponBase();
-
+	FTimerHandle Delay;	
 
 public:
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Setup")
+	class APlayerCharacter* OwningPlayer;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup")
+	class UAnimMontage* FireAnim;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Setup")
 	TSubclassOf<AItemBase> InventoryItem;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Setup")
 	FName WeaponDataBaseID;	
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Setup")
 	FWeaponStats Stats;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Setup")
 	class USkeletalMeshComponent* Appearance;
+
+	bool bCanFire = true;
+
+	// Methods	
+	void StartFire();
+	void StopFire();
+
+	void ResetFire();
 };

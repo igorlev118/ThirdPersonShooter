@@ -56,10 +56,12 @@ protected:
 		bool bShowObtainedItem;
 
 	// Internal methods
-	UFUNCTION(BlueprintCallable)
-	bool AddItemInsideClass(TSubclassOf<AItemBase> Item, FName DatabaseKey, int32 Amount, int32& Rest);
+	
 
 public:
+
+	UFUNCTION(BlueprintCallable)
+	bool AddItemInsideClass(TSubclassOf<AItemBase> Item, FName DatabaseKey, int32 Amount, int32& Rest);
 
 
 	// Events

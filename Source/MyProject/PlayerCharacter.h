@@ -21,9 +21,12 @@ class MYPROJECT_API APlayerCharacter : public AMyProjectCharacter
 
 private:
 
+	
+
 	bool bModifyItemDrag;
 	bool bIsSprinting;
 	bool bIsAnimationPlaying = false;
+	bool bIsAiming;
 	FTimerHandle AnimationPlaytime;	
 
 	// Private Methods
@@ -33,7 +36,19 @@ private:
 	bool bIsMainWeaponEquipped;
 	bool bIsSecondaryWeaponEquipped;
 
+
 protected:
+
+	
+
+	void BeginPlay() override;
+
+	// Aim Camera
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UCameraComponent* AimCamera;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	USpringArmComponent* AimCameraArm;
 
 	// Movement
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Movement")
@@ -76,6 +91,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup")
 	float NeededExpForNextLevel = 100;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Setup")
+	FRotator InitialRotation;
+
 public:
 
 	// BP Events
@@ -95,6 +113,10 @@ public:
 	void Sprint();
 	void NoSprint();
 	void EquipAttachedWeapon();
+	void Takeaim();
+	void LoseAim();
+	void Fire();
+	void StopFire();
 
 	UFUNCTION(BlueprintCallable)
 	void EquipAttachedWeaponForAnim();
@@ -129,6 +151,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE float GetNeededExp() { return NeededExpForNextLevel; }
+
+	UFUNCTION(BlueprintCallable)
+		FORCEINLINE bool GetIsAiming() { return bIsAiming; }
 	
 	// public properties
 	class APickup* FoundPickup = nullptr;	
