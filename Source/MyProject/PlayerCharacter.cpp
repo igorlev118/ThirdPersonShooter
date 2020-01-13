@@ -12,6 +12,7 @@
 #include "WeaponBase.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Components/CapsuleComponent.h"
 
 
 APlayerCharacter::APlayerCharacter() : Super()
@@ -26,7 +27,7 @@ APlayerCharacter::APlayerCharacter() : Super()
 	AimCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("AimCamera"));	
 	AimCamera->SetupAttachment(AimCameraArm);
 
-	
+	GetCharacterMovement()->GetNavAgentPropertiesRef().bCanCrouch = true;
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) 
@@ -50,7 +51,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction("LoseAim", IE_Released, this, &APlayerCharacter::LoseAim);
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APlayerCharacter::Fire);
 	PlayerInputComponent->BindAction("Fire", IE_Released, this, &APlayerCharacter::StopFire);
-	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &APlayerCharacter::Reload);	
+	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &APlayerCharacter::Reload);
+	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &APlayerCharacter::Crouch);	
 }
 
 void APlayerCharacter::Tick(float DeltaSeconds)
@@ -78,7 +80,7 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 		{
 			CrosshairStyle(1);
 		}
-	}
+	}	
 }
 
 
@@ -126,6 +128,8 @@ void APlayerCharacter::Takeaim()
 	bUseControllerRotationRoll = true;
 	bUseControllerRotationYaw = true;	
 	bIsAiming = true;
+	CurrentlyEquippedWeapon->bCanFire = true;
+	CurrentlyEquippedWeapon->bIsShooting = false;
 	ManageCrosshair();
 }
 
@@ -139,6 +143,7 @@ void APlayerCharacter::LoseAim()
 	bUseControllerRotationYaw = false;
 	SetActorRotation(FRotator(InitialRotation.Pitch, GetActorRotation().Yaw, InitialRotation.Roll));
 	CurrentlyEquippedWeapon->StopFire();
+	CurrentlyEquippedWeapon->bIsShooting = false;
 	bIsAiming = false;
 	ManageCrosshair();
 }
@@ -146,7 +151,7 @@ void APlayerCharacter::LoseAim()
 void APlayerCharacter::Fire()
 {
 	if (CurrentlyEquippedWeapon && bIsAiming)
-	{
+	{		
 		CurrentlyEquippedWeapon->StartFire();	
 	}
 }
@@ -166,6 +171,23 @@ void APlayerCharacter::Reload()
 		CurrentlyEquippedWeapon->Reload();
 	}
 }
+
+void APlayerCharacter::Crouch()
+{
+	if (bIsAiming) { return; }
+	if (!bIsCrouched)
+	{
+		Super::Crouch();
+		bIsCrouched = true;
+	}
+	else
+	{
+		Super::UnCrouch();
+		bIsCrouched = false;
+	}
+	
+}
+
 
 void APlayerCharacter::EquipAttachedWeaponForAnim()
 {

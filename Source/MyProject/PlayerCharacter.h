@@ -19,10 +19,8 @@ class MYPROJECT_API APlayerCharacter : public AMyProjectCharacter
 	void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	virtual void Tick(float DeltaSeconds) override;
 
-private:
-
+private:	
 	
-
 	bool bModifyItemDrag;
 	bool bIsSprinting;
 	bool bIsAnimationPlaying = false;
@@ -32,9 +30,10 @@ private:
 	// Private Methods
 	void ResetEquipWeapon();
 
-	// to set animation based on equipment
+	// to set animation
 	bool bIsMainWeaponEquipped;
 	bool bIsSecondaryWeaponEquipped;
+	bool bIsCrouched;
 
 
 protected:
@@ -133,6 +132,7 @@ public:
 	void Fire();
 	void StopFire();
 	void Reload();
+	void Crouch();	
 
 	UFUNCTION(BlueprintCallable)
 	void EquipAttachedWeaponForAnim();
@@ -170,6 +170,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE bool GetIsAiming() { return bIsAiming; }
+
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE bool GetIsCrouched() { return bIsCrouched; }
 
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE UCameraComponent* GetAimCamera() { return AimCamera; }

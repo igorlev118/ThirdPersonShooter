@@ -71,8 +71,10 @@ class MYPROJECT_API AWeaponBase : public AItemBase
 
 	AWeaponBase();
 	FTimerHandle Delay;
-	FTimerHandle ShotStopper;	
+	FTimerHandle ReloadTimer;
+	FTimerHandle ResetShots;
 	int8 ShotCounter = 0;
+	float FireDuration;	
 
 public:
 
@@ -110,14 +112,16 @@ public:
 	class USkeletalMeshComponent* Appearance;
 
 	bool bCanFire = true;
+	bool bIsReloading;
+	bool bIsShooting;
 
 	// Methods	
 	void StartFire();
 	void StopFire();
 	void Reload();
-	void DelayHandler();
-
+	void ReloadHandler();
+	void ResetShotCounter();
 	void ResetAnim();
-
+	
 	FORCEINLINE uint8 GetShotCounter() { return ShotCounter; }
 };

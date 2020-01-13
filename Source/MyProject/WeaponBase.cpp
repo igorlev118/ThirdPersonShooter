@@ -18,12 +18,16 @@ AWeaponBase::AWeaponBase()
 
 void AWeaponBase::StartFire()
 {
+	if (bIsReloading || bIsShooting) { return; }
+	bCanFire = true;
+
 	// Single Fire Mode
 	if (!Stats.bHasBurstFireMode && !Stats.bHasFullAutoMode)
-	{
+	{		
 		if (!OwningPlayer || !bCanFire) { return; }
 		if (Clip <= 0) { Reload(); return; }
 
+		bIsShooting = true;
 		bCanFire = false;
 		Clip--;
 		OwningPlayer->UpdateAmmoOnly();
@@ -63,12 +67,12 @@ void AWeaponBase::StartFire()
 	}	
 
 	// Auto Fire Mode
-
-	else if (!Stats.bHasBurstFireMode && Stats.bHasFullAutoMode)
+	else if (!Stats.bHasBurstFireMode && Stats.bHasFullAutoMode && bCanFire)
 	{
-		if (!OwningPlayer || !bCanFire) { return; }
+		if (!OwningPlayer) { return; }
 		if (Clip <= 0) { Reload(); return; }				
-		
+
+		bIsShooting = true;
 		Clip--;
 		OwningPlayer->UpdateAmmoOnly();
 		OwningPlayer->ManageCrosshairShoot();
@@ -107,58 +111,68 @@ void AWeaponBase::StartFire()
 		else { UE_LOG(LogTemp, Warning, TEXT("Miss!")); }
 		float PlayRate = FireAnim->GetPlayLength();		
 		float TargetPlayRate = 1 / Stats.FireRate / PlayRate;		
-		float FireDuration = OwningPlayer->PlayAnimMontage(FireAnim, TargetPlayRate);
+		FireDuration = OwningPlayer->PlayAnimMontage(FireAnim, TargetPlayRate);		
 
-		GetWorld()->GetTimerManager().SetTimer(Delay, this, &AWeaponBase::ResetAnim, FireDuration, true);
+		GetWorld()->GetTimerManager().ClearTimer(ResetShots);
+		GetWorld()->GetTimerManager().SetTimer(Delay, this, &AWeaponBase::ResetAnim, FireDuration, true);		
 	}
 }
 
 void AWeaponBase::StopFire()
-{
-	if (Stats.bHasFullAutoMode)
+{		
+	if (Stats.bHasFullAutoMode && bCanFire)
 	{
 		bCanFire = false;
-		ShotCounter = 0;
-		GetWorld()->GetTimerManager().SetTimer(ShotStopper, this, &AWeaponBase::DelayHandler, 0.2f);
-	}
+		GetWorld()->GetTimerManager().SetTimer(ResetShots, this, &AWeaponBase::ResetShotCounter, 0.5);
+	}	
 }
-	
+
+
+void AWeaponBase::ReloadHandler()
+{
+	bCanFire = true;
+	bIsReloading = false;
+	GetWorld()->GetTimerManager().ClearTimer(ReloadTimer);
+}
+
+void AWeaponBase::ResetShotCounter()
+{
+	ShotCounter = 0;
+}
+
+void AWeaponBase::ResetAnim()
+{	
+	bIsShooting = false;
+	GetWorld()->GetTimerManager().ClearTimer(Delay);	
+	if (Stats.bHasFullAutoMode && bCanFire)
+	{		
+		StartFire();		
+	}
+	else
+	{
+		bCanFire = true;		
+	}	
+}
 
 void AWeaponBase::Reload()
 {
 	if (Clip == Stats.MagazineSize) { return; }
 	UE_LOG(LogTemp, Warning, TEXT("Reloading"));
-	bCanFire = false;	
+	bCanFire = false;
+	bIsReloading = true;
 	ShotCounter = 0;
-	if (ReserveAmmo <= 0)	{return;}
-	if (ReserveAmmo + Clip <= Stats.MagazineSize) 
-	{	Clip += ReserveAmmo; 
-		ReserveAmmo = 0; 
+	if (ReserveAmmo <= 0) { return; }
+	if (ReserveAmmo + Clip <= Stats.MagazineSize)
+	{
+		Clip += ReserveAmmo;
+		ReserveAmmo = 0;
 	}
 	else
 	{
 		ReserveAmmo -= Stats.MagazineSize - Clip;
 		Clip = Stats.MagazineSize;
 	}
-	
-	OwningPlayer->UpdateAmmoOnly();
 	float ReloadDuration = OwningPlayer->PlayAnimMontage(ReloadAnim);
-	GetWorld()->GetTimerManager().SetTimer(Delay, this, &AWeaponBase::DelayHandler, ReloadDuration);
-}
-
-void AWeaponBase::DelayHandler()
-{
-	bCanFire = true;
-	GetWorld()->GetTimerManager().ClearTimer(ShotStopper);
-}
-
-void AWeaponBase::ResetAnim()
-{		
-	OwningPlayer->StopAnimMontage();
-	GetWorld()->GetTimerManager().ClearTimer(Delay);
-	if (Stats.bHasFullAutoMode)
-	{
-		StartFire();
-	}
-	bCanFire = true;
+	GetWorld()->GetTimerManager().SetTimer(ReloadTimer, this, &AWeaponBase::ReloadHandler, ReloadDuration);
+	OwningPlayer->UpdateAmmoOnly();
 }
