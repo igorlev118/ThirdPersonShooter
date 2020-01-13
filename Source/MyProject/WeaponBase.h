@@ -24,12 +24,13 @@ struct FWeaponStats : public FTableRowBase
 		DamagePerBullet = 0;
 		FireRate = 0;
 		bHasFullAutoMode = false;
-		bHasBurstFireMode = false;		
-		MinSpread = 0;
+		bHasBurstFireMode = false;				
 		MaxSpread = 0;
 		MagazineSize = 0;
 		MaxAmmo = 0;
 		Category = EWeaponCategory::WC_NONE;
+		UIDisplay = nullptr;
+		OnHitParticle = nullptr;
 	}
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
@@ -42,10 +43,7 @@ struct FWeaponStats : public FTableRowBase
 	bool bHasFullAutoMode;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	bool bHasBurstFireMode;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	float MinSpread;
+	bool bHasBurstFireMode;	
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	float MaxSpread;	
@@ -58,6 +56,12 @@ struct FWeaponStats : public FTableRowBase
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	EWeaponCategory Category;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UTexture2D* UIDisplay;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UParticleSystem* OnHitParticle;
 };
 
 UCLASS()
@@ -67,7 +71,8 @@ class MYPROJECT_API AWeaponBase : public AItemBase
 
 	AWeaponBase();
 	FTimerHandle Delay;
-	FTimerHandle ShotStopper;
+	FTimerHandle ShotStopper;	
+	int8 ShotCounter = 0;
 
 public:
 
@@ -113,4 +118,6 @@ public:
 	void DelayHandler();
 
 	void ResetAnim();
+
+	FORCEINLINE uint8 GetShotCounter() { return ShotCounter; }
 };

@@ -106,6 +106,21 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void UpdateProgress();
 
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void UpdateWeapons();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void UpdateAmmoOnly();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void ManageCrosshair();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void ManageCrosshairShoot();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void CrosshairStyle(int32 Index);
+
 	// Methods
 	void Interact();
 	void ModifyItemDrag();
@@ -117,6 +132,7 @@ public:
 	void LoseAim();
 	void Fire();
 	void StopFire();
+	void Reload();
 
 	UFUNCTION(BlueprintCallable)
 	void EquipAttachedWeaponForAnim();

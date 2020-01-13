@@ -50,6 +50,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction("LoseAim", IE_Released, this, &APlayerCharacter::LoseAim);
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APlayerCharacter::Fire);
 	PlayerInputComponent->BindAction("Fire", IE_Released, this, &APlayerCharacter::StopFire);
+	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &APlayerCharacter::Reload);	
 }
 
 void APlayerCharacter::Tick(float DeltaSeconds)
@@ -65,7 +66,19 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 		float CurrentSpeed = GetCharacterMovement()->MaxWalkSpeed;
 		float TargetSpeed = FMath::FInterpTo(CurrentSpeed, Walkspeed, GetWorld()->DeltaTimeSeconds, InterpolationSpeed);
 		GetCharacterMovement()->MaxWalkSpeed = TargetSpeed;
-	}	
+	}
+
+	if (bIsAiming)
+	{
+		if (this->GetVelocity().Size() > 0 || CurrentlyEquippedWeapon->GetShotCounter() >= 4)
+		{
+			CrosshairStyle(2);
+		}
+		else
+		{
+			CrosshairStyle(1);
+		}
+	}
 }
 
 
@@ -113,6 +126,7 @@ void APlayerCharacter::Takeaim()
 	bUseControllerRotationRoll = true;
 	bUseControllerRotationYaw = true;	
 	bIsAiming = true;
+	ManageCrosshair();
 }
 
 void APlayerCharacter::LoseAim()
@@ -126,13 +140,14 @@ void APlayerCharacter::LoseAim()
 	SetActorRotation(FRotator(InitialRotation.Pitch, GetActorRotation().Yaw, InitialRotation.Roll));
 	CurrentlyEquippedWeapon->StopFire();
 	bIsAiming = false;
+	ManageCrosshair();
 }
 
 void APlayerCharacter::Fire()
 {
 	if (CurrentlyEquippedWeapon && bIsAiming)
 	{
-		CurrentlyEquippedWeapon->StartFire();
+		CurrentlyEquippedWeapon->StartFire();	
 	}
 }
 
@@ -140,7 +155,15 @@ void APlayerCharacter::StopFire()
 {
 	if (CurrentlyEquippedWeapon && bIsAiming)
 	{		
-		CurrentlyEquippedWeapon->StopFire();
+		CurrentlyEquippedWeapon->StopFire();		
+	}
+}
+
+void APlayerCharacter::Reload()
+{
+	if (CurrentlyEquippedWeapon)
+	{		
+		CurrentlyEquippedWeapon->Reload();
 	}
 }
 
@@ -213,12 +236,13 @@ void APlayerCharacter::EquipWeapon(AWeaponBase* Weapon)
 			{
 				CurrentlyEquippedWeapon = nullptr;
 			}
-			MainWeapon->Destroy();
+			MainWeapon->Destroy();			
 		}
 				
 		Weapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("MainWeapon"));
 		MainWeapon = Weapon;
-		bIsMainWeaponEquipped = false;		
+		bIsMainWeaponEquipped = false;
+		UpdateWeapons();
 		break;
 
 	case EWeaponCategory::WC_SECONDARY:
@@ -238,6 +262,7 @@ void APlayerCharacter::EquipWeapon(AWeaponBase* Weapon)
 		Weapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Secondaryweapon"));
 		SecondaryWeapon = Weapon;		
 		bIsSecondaryWeaponEquipped = false;
+		UpdateWeapons();
 		break;
 
 	default:
