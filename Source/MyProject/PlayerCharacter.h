@@ -24,7 +24,7 @@ private:
 	bool bModifyItemDrag;
 	bool bIsSprinting;
 	bool bIsAnimationPlaying = false;
-	FTimerHandle AnimationPlaytime;
+	FTimerHandle AnimationPlaytime;	
 
 	// Private Methods
 	void ResetEquipWeapon();
@@ -35,6 +35,7 @@ private:
 
 protected:
 
+	// Movement
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Movement")
 	float Walkspeed = 300;
 
@@ -44,6 +45,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Movement")
 	float InterpolationSpeed = 1;
 
+
+	// Weapon
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Weapon")
 	class AWeaponBase* MainWeapon;	
 
@@ -56,7 +59,34 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	UAnimMontage* EquipWeaponAnim;
 
+
+	// Setup
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup")
+	float MaxHealth = 100;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup")
+	float Health;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup")
+	int32 Level = 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup")
+	float GatheredExp = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup")
+	float NeededExpForNextLevel = 100;
+
 public:
+
+	// BP Events
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void UpdateHealthBar();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void UpdateLevel();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void UpdateProgress();
 
 	// Methods
 	void Interact();
@@ -85,7 +115,20 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE bool GetIsSecondaryWeaponEquipped() { return bIsSecondaryWeaponEquipped; }
 
-	
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE float GetHealth() { return Health; }
+
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE float GetMaxHealth() { return MaxHealth; }
+
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE int32 GetLevel() { return Level; }
+
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE float GetExp() { return GatheredExp; }
+
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE float GetNeededExp() { return NeededExpForNextLevel; }
 	
 	// public properties
 	class APickup* FoundPickup = nullptr;	

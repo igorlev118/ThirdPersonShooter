@@ -15,6 +15,7 @@
 APlayerCharacter::APlayerCharacter() : Super()
 {
 	GetCharacterMovement()->MaxWalkSpeed = Walkspeed;
+	Health = MaxHealth;	
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) 
@@ -148,6 +149,7 @@ void APlayerCharacter::EquipWeapon(AWeaponBase* Weapon)
 			ACustomCharacterController* Controller = Cast<ACustomCharacterController>(GetController());
 			int32 Rest;
 			Controller->InventoryReference->AddItem(MainWeapon->InventoryItem, MainWeapon->DatabaseID, 1, Rest);
+			Controller->InventoryReference->AddItem
 			if (CurrentlyEquippedWeapon == MainWeapon)
 			{
 				CurrentlyEquippedWeapon = nullptr;

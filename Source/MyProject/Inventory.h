@@ -57,7 +57,7 @@ protected:
 
 	// Internal methods
 	UFUNCTION(BlueprintCallable)
-		bool AddItemInsideClass(TSubclassOf<AItemBase> Item, FName DatabaseKey, int32 Amount, int32& Rest);
+	bool AddItemInsideClass(TSubclassOf<AItemBase> Item, FName DatabaseKey, int32 Amount, int32& Rest);
 
 public:
 
