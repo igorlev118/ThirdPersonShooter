@@ -31,6 +31,8 @@ struct FWeaponStats : public FTableRowBase
 		Category = EWeaponCategory::WC_NONE;
 		UIDisplay = nullptr;
 		OnHitParticle = nullptr;
+		MuzzleFlash = nullptr;
+		Projectile = nullptr;
 	}
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
@@ -62,6 +64,12 @@ struct FWeaponStats : public FTableRowBase
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	UParticleSystem* OnHitParticle;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UParticleSystem* MuzzleFlash;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TSubclassOf<class AProjectile> Projectile;
 };
 
 UCLASS()
@@ -73,8 +81,7 @@ class MYPROJECT_API AWeaponBase : public AItemBase
 	FTimerHandle Delay;
 	FTimerHandle ReloadTimer;
 	FTimerHandle ResetShots;
-	int8 ShotCounter = 0;
-	float FireDuration;	
+	int8 ShotCounter = 0;	
 
 public:
 
@@ -96,7 +103,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Setup")
 	FName WeaponDataBaseID;	
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Setup")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup")
 	FWeaponStats Stats;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Setup")
@@ -110,6 +117,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Setup")
 	class USkeletalMeshComponent* Appearance;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Setup")
+	USceneComponent* Root;
 
 	bool bCanFire = true;
 	bool bIsReloading;

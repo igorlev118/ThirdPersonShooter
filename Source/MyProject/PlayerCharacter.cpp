@@ -23,9 +23,11 @@ APlayerCharacter::APlayerCharacter() : Super()
 	AimCameraArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("AimCameraArm"));
 	AimCameraArm->TargetArmLength = 10;
 	AimCameraArm->SetupAttachment(RootComponent);
+	AimCameraArm->bUsePawnControlRotation = true;
 		
 	AimCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("AimCamera"));	
 	AimCamera->SetupAttachment(AimCameraArm);
+	AimCamera->bUsePawnControlRotation = false;
 
 	GetCharacterMovement()->GetNavAgentPropertiesRef().bCanCrouch = true;
 }
@@ -122,10 +124,11 @@ void APlayerCharacter::EquipAttachedWeapon()
 void APlayerCharacter::Takeaim()
 {
 	if (!CurrentlyEquippedWeapon) { return; }
-	GetFollowCamera()->SetActive(false, true);	
+	GetFollowCamera()->SetActive(false, true);
+	bIsSprinting = false;
 	AimCamera->SetActive(true);	
-	bUseControllerRotationPitch = true;
-	bUseControllerRotationRoll = true;
+	//bUseControllerRotationPitch = true;
+	//bUseControllerRotationRoll = true;
 	bUseControllerRotationYaw = true;	
 	bIsAiming = true;
 	CurrentlyEquippedWeapon->bCanFire = true;

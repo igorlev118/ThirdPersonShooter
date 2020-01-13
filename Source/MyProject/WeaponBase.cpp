@@ -9,9 +9,14 @@
 #include "Kismet/GameplayStatics.h"
 #include "Animation/AnimMontage.h"
 #include "DrawDebugHelpers.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Projectile.h"
 
-AWeaponBase::AWeaponBase()
+AWeaponBase::AWeaponBase() : Super()
 {
+	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	SetRootComponent(Root);
+
 	Appearance = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("GunMesh"));
 	Appearance->SetupAttachment(RootComponent);	
 }
@@ -51,6 +56,8 @@ void AWeaponBase::StartFire()
 
 		bool bHit = GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECollisionChannel::ECC_Visibility);
 		UGameplayStatics::PlaySound2D(this, FireSound);
+		UGameplayStatics::SpawnEmitterAttached(Stats.MuzzleFlash, Appearance, TEXT("MuzzleFlash"), 
+						Appearance->GetSocketLocation(TEXT("MuzzleFlash")), Appearance->GetSocketRotation(TEXT("MuzzleFlash")), EAttachLocation::KeepWorldPosition);
 
 		if (bHit)
 		{
@@ -58,12 +65,29 @@ void AWeaponBase::StartFire()
 			if (Stats.OnHitParticle)
 			{
 				UGameplayStatics::SpawnEmitterAtLocation(this, Stats.OnHitParticle, OutHit.Location);
-			}			
-		}
-		else { UE_LOG(LogTemp, Warning, TEXT("Miss!")); }		
-		float FireDuration = OwningPlayer->PlayAnimMontage(FireAnim);
+			}
 
-		GetWorld()->GetTimerManager().SetTimer(Delay, this, &AWeaponBase::ResetAnim, FireDuration, true);		
+			FVector MuzzleSocketLocation = Appearance->GetSocketLocation(TEXT("MuzzleFlash"));
+			FRotator ProjectileRotation = UKismetMathLibrary::FindLookAtRotation(MuzzleSocketLocation, OutHit.Location);
+			GetWorld()->SpawnActor(Stats.Projectile, &MuzzleSocketLocation, &ProjectileRotation);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Miss!"));
+			FVector MuzzleSocketLocation = Appearance->GetSocketLocation(TEXT("MuzzleFlash"));
+			FRotator ProjectileRotation = UKismetMathLibrary::FindLookAtRotation(MuzzleSocketLocation, End);
+			GetWorld()->SpawnActor(Stats.Projectile, &MuzzleSocketLocation, &ProjectileRotation);
+		}
+
+		if(FireAnim)
+		{
+			float FireDuration = OwningPlayer->PlayAnimMontage(FireAnim);
+		}
+
+		float TargetPlayRate = 1 / Stats.FireRate;
+		
+
+		GetWorld()->GetTimerManager().SetTimer(Delay, this, &AWeaponBase::ResetAnim, TargetPlayRate, true);		
 	}	
 
 	// Auto Fire Mode
@@ -97,8 +121,10 @@ void AWeaponBase::StartFire()
 		
 		bool bHit = GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECollisionChannel::ECC_Visibility);
 		UGameplayStatics::PlaySound2D(this, FireSound);
+		UGameplayStatics::SpawnEmitterAttached(Stats.MuzzleFlash, Appearance, TEXT("MuzzleFlash"), 
+						Appearance->GetSocketLocation(TEXT("MuzzleFlash")), Appearance->GetSocketRotation(TEXT("MuzzleFlash")), EAttachLocation::KeepWorldPosition);
 
-		DrawDebugLine(GetWorld(), this->GetActorLocation(), End, FColor::Red, false, 2, 0, 12.333);
+		//DrawDebugLine(GetWorld(), this->GetActorLocation(), End, FColor::Red, false, 2, 0, 12.333);
 
 		if (bHit)
 		{
@@ -107,14 +133,24 @@ void AWeaponBase::StartFire()
 			{
 				UGameplayStatics::SpawnEmitterAtLocation(this, Stats.OnHitParticle, OutHit.Location);
 			}
-		}
-		else { UE_LOG(LogTemp, Warning, TEXT("Miss!")); }
-		float PlayRate = FireAnim->GetPlayLength();		
-		float TargetPlayRate = 1 / Stats.FireRate / PlayRate;		
-		FireDuration = OwningPlayer->PlayAnimMontage(FireAnim, TargetPlayRate);		
 
+			FVector MuzzleSocketLocation = Appearance->GetSocketLocation(TEXT("MuzzleFlash"));
+			FRotator ProjectileRotation = UKismetMathLibrary::FindLookAtRotation(MuzzleSocketLocation, OutHit.Location);			
+			GetWorld()->SpawnActor(Stats.Projectile, &MuzzleSocketLocation, &ProjectileRotation);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Miss!"));
+			FVector MuzzleSocketLocation = Appearance->GetSocketLocation(TEXT("MuzzleFlash"));
+			FRotator ProjectileRotation = UKismetMathLibrary::FindLookAtRotation(MuzzleSocketLocation, End);
+			GetWorld()->SpawnActor(Stats.Projectile, &MuzzleSocketLocation, &ProjectileRotation);
+		}
+				
+		float TargetPlayRate = 1 / Stats.FireRate;		
+		OwningPlayer->PlayAnimMontage(FireAnim, 10);
+		
 		GetWorld()->GetTimerManager().ClearTimer(ResetShots);
-		GetWorld()->GetTimerManager().SetTimer(Delay, this, &AWeaponBase::ResetAnim, FireDuration, true);		
+		GetWorld()->GetTimerManager().SetTimer(Delay, this, &AWeaponBase::ResetAnim, TargetPlayRate, true);		
 	}
 }
 
