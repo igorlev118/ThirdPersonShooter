@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "ITakeDamage.h"
 #include "AICharacter.generated.h"
 
 UCLASS()
-class MYPROJECT_API AAICharacter : public ACharacter
+class MYPROJECT_API AAICharacter : public ACharacter, public IITakeDamage
 {
 	GENERATED_BODY()
 
@@ -28,7 +29,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Setup")
 	float MaxHealth = 200;
 
-	float CurrentHealth;
+	float CurrentHealth;	
 
 public:	
 	// Called every frame
@@ -36,6 +37,11 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	void ITakeDamage(FName Bone, float Damage, float HeadShotMultiplier) override;
+
+	UFUNCTION(BlueprintCallable)
+	bool IsDead();
 
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE float GetCurrentHealth() { return CurrentHealth; }

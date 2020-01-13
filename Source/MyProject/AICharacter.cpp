@@ -25,11 +25,30 @@ void AAICharacter::BeginPlay()
 	CurrentHealth = MaxHealth;
 }
 
+void AAICharacter::ITakeDamage(FName Bone, float Damage, float HeadShotMultiplier)
+{
+	if (Bone == TEXT("Head"))
+	{
+		CurrentHealth -= Damage * HeadShotMultiplier;
+		UE_LOG(LogTemp, Warning, TEXT("Damage: %f"), Damage * HeadShotMultiplier)
+	}
+	else
+	{
+		CurrentHealth -= Damage;
+		UE_LOG(LogTemp, Warning, TEXT("Damage: %f"), Damage)
+	}
+}
+
+bool AAICharacter::IsDead()
+{
+	return CurrentHealth <= 0;
+}
+
 // Called every frame
 void AAICharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	
 }
 
 // Called to bind functionality to input

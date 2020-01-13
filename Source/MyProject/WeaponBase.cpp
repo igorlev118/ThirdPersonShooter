@@ -11,6 +11,8 @@
 #include "DrawDebugHelpers.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Projectile.h"
+#include "ITakeDamage.h"
+#include "AICharacter.h"
 
 AWeaponBase::AWeaponBase() : Super()
 {
@@ -54,7 +56,7 @@ void AWeaponBase::StartFire()
 			End = EndPoint;
 		}
 
-		bool bHit = GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECollisionChannel::ECC_Visibility);
+		bool bHit = GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECollisionChannel::ECC_Camera);
 		UGameplayStatics::PlaySound2D(this, FireSound);
 		UGameplayStatics::SpawnEmitterAttached(Stats.MuzzleFlash, Appearance, TEXT("MuzzleFlash"), 
 						Appearance->GetSocketLocation(TEXT("MuzzleFlash")), Appearance->GetSocketRotation(TEXT("MuzzleFlash")), EAttachLocation::KeepWorldPosition);
@@ -65,6 +67,14 @@ void AWeaponBase::StartFire()
 			if (Stats.OnHitParticle)
 			{
 				UGameplayStatics::SpawnEmitterAtLocation(this, Stats.OnHitParticle, OutHit.Location);
+			}
+
+			IITakeDamage* HitActorInterface = Cast<IITakeDamage>(OutHit.Actor);
+			if (HitActorInterface)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("true"))
+
+					HitActorInterface->ITakeDamage(OutHit.BoneName, Stats.DamagePerBullet, Stats.HeadShotMultiplier);
 			}
 
 			FVector MuzzleSocketLocation = Appearance->GetSocketLocation(TEXT("MuzzleFlash"));
@@ -123,7 +133,7 @@ void AWeaponBase::StartFire()
 		}
 		
 		
-		bool bHit = GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECollisionChannel::ECC_Visibility);
+		bool bHit = GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECollisionChannel::ECC_Camera);
 		UGameplayStatics::PlaySound2D(this, FireSound);
 		UGameplayStatics::SpawnEmitterAttached(Stats.MuzzleFlash, Appearance, TEXT("MuzzleFlash"), 
 						Appearance->GetSocketLocation(TEXT("MuzzleFlash")), Appearance->GetSocketRotation(TEXT("MuzzleFlash")), EAttachLocation::KeepWorldPosition);
@@ -136,6 +146,14 @@ void AWeaponBase::StartFire()
 			if (Stats.OnHitParticle)
 			{
 				UGameplayStatics::SpawnEmitterAtLocation(this, Stats.OnHitParticle, OutHit.Location);
+			}
+
+			IITakeDamage* HitActorInterface = Cast<IITakeDamage>(OutHit.Actor);
+			if(HitActorInterface)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("true"))
+
+				HitActorInterface->ITakeDamage(OutHit.BoneName, Stats.DamagePerBullet, Stats.HeadShotMultiplier);
 			}
 
 			FVector MuzzleSocketLocation = Appearance->GetSocketLocation(TEXT("MuzzleFlash"));

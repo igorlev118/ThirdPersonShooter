@@ -22,6 +22,7 @@ struct FWeaponStats : public FTableRowBase
 	FWeaponStats()
 	{
 		DamagePerBullet = 0;
+		HeadShotMultiplier = 2;
 		FireRate = 0;
 		bHasFullAutoMode = false;
 		bHasBurstFireMode = false;				
@@ -38,6 +39,9 @@ struct FWeaponStats : public FTableRowBase
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	float DamagePerBullet;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float HeadShotMultiplier;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	float FireRate;
