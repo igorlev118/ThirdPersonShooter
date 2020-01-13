@@ -26,6 +26,7 @@ struct FWeaponStats : public FTableRowBase
 		bHasFullAutoMode = false;
 		bHasBurstFireMode = false;				
 		MaxSpread = 0;
+		Recoil = 0;
 		MagazineSize = 0;
 		MaxAmmo = 0;
 		Category = EWeaponCategory::WC_NONE;
@@ -48,7 +49,10 @@ struct FWeaponStats : public FTableRowBase
 	bool bHasBurstFireMode;	
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	float MaxSpread;	
+	float MaxSpread;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float Recoil;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	int32 MagazineSize;

@@ -86,6 +86,10 @@ void AWeaponBase::StartFire()
 
 		float TargetPlayRate = 1 / Stats.FireRate;
 		
+		float RecoilPitch = FMath::RandRange(0.1, Stats.Recoil);
+		float RecoilYaw = FMath::RandRange(-Stats.Recoil / 2, Stats.Recoil / 2);
+		OwningPlayer->AddControllerPitchInput(-RecoilPitch);
+		OwningPlayer->AddControllerYawInput(-RecoilYaw);
 
 		GetWorld()->GetTimerManager().SetTimer(Delay, this, &AWeaponBase::ResetAnim, TargetPlayRate, true);		
 	}	
@@ -148,6 +152,11 @@ void AWeaponBase::StartFire()
 				
 		float TargetPlayRate = 1 / Stats.FireRate;		
 		OwningPlayer->PlayAnimMontage(FireAnim, 10);
+
+		float RecoilPitch = FMath::RandRange(0.1, Stats.Recoil);
+		float RecoilYaw = FMath::RandRange(-Stats.Recoil/2, Stats.Recoil/2);
+		OwningPlayer->AddControllerPitchInput(-RecoilPitch);
+		OwningPlayer->AddControllerYawInput(-RecoilYaw);
 		
 		GetWorld()->GetTimerManager().ClearTimer(ResetShots);
 		GetWorld()->GetTimerManager().SetTimer(Delay, this, &AWeaponBase::ResetAnim, TargetPlayRate, true);		
