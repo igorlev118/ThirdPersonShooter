@@ -22,6 +22,13 @@ EBTNodeResult::Type UChooseNextWaypoint::ExecuteTask(UBehaviorTreeComponent& Own
 	// the patrolpoint at the index position  
 	UBlackboardComponent* BlackboardComp = OwnerComp.GetBlackboardComponent();
 	int32 Index = BlackboardComp->GetValueAsInt(IndexKey.SelectedKeyName);
+
+	if(PatrolPoints.Num() != 1)
+	{
+		BlackboardComp->SetValueAsObject(FirstWaypointKey.SelectedKeyName, PatrolPoints[0]);
+		BlackboardComp->SetValueAsObject(LastWaypointKey.SelectedKeyName, PatrolPoints[PatrolPoints.Num() - 1]);
+	}
+	
 	BlackboardComp->SetValueAsObject(WaypointKey.SelectedKeyName, PatrolPoints[Index]);
 
 	// incrementing index, while ensuring array stays in bound and setting the index key

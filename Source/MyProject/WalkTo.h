@@ -4,28 +4,25 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/BTTaskNode.h"
-#include "ChooseNextWaypoint.generated.h"
+#include "WalkTo.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class MYPROJECT_API UChooseNextWaypoint : public UBTTaskNode
+class MYPROJECT_API UWalkTo : public UBTTaskNode
 {
 	GENERATED_BODY()
 
 	EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
-
+	
+	void OnMessage(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, FName Message, int32 RequestID, bool bSuccess) override;
+		
 protected:
 	UPROPERTY(EditAnywhere, Category = "BlackboardKeys")
-	struct FBlackboardKeySelector IndexKey;
+	struct FBlackboardKeySelector WaypointKey;
 
 	UPROPERTY(EditAnywhere, Category = "BlackboardKeys")
-	FBlackboardKeySelector WaypointKey;
-
-	UPROPERTY(EditAnywhere, Category = "BlackboardKeys")
-	FBlackboardKeySelector FirstWaypointKey;
-
-	UPROPERTY(EditAnywhere, Category = "BlackboardKeys")
-	FBlackboardKeySelector LastWaypointKey;
+	float WalkSpeed = 150;
 };
+
