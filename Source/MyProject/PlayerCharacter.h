@@ -153,7 +153,10 @@ public:
 	FORCEINLINE float GetNeededExp() { return NeededExpForNextLevel; }
 
 	UFUNCTION(BlueprintCallable)
-		FORCEINLINE bool GetIsAiming() { return bIsAiming; }
+	FORCEINLINE bool GetIsAiming() { return bIsAiming; }
+
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE UCameraComponent* GetAimCamera() { return AimCamera; }
 	
 	// public properties
 	class APickup* FoundPickup = nullptr;	

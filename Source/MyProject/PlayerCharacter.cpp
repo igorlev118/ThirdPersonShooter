@@ -111,8 +111,7 @@ void APlayerCharacter::Takeaim()
 	AimCamera->SetActive(true);	
 	bUseControllerRotationPitch = true;
 	bUseControllerRotationRoll = true;
-	bUseControllerRotationYaw = true;
-	
+	bUseControllerRotationYaw = true;	
 	bIsAiming = true;
 }
 
@@ -125,6 +124,7 @@ void APlayerCharacter::LoseAim()
 	bUseControllerRotationRoll = false;
 	bUseControllerRotationYaw = false;
 	SetActorRotation(FRotator(InitialRotation.Pitch, GetActorRotation().Yaw, InitialRotation.Roll));
+	CurrentlyEquippedWeapon->StopFire();
 	bIsAiming = false;
 }
 

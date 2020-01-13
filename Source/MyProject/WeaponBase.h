@@ -27,7 +27,7 @@ struct FWeaponStats : public FTableRowBase
 		bHasBurstFireMode = false;		
 		MinSpread = 0;
 		MaxSpread = 0;
-		MagazineSize = 30;
+		MagazineSize = 0;
 		MaxAmmo = 0;
 		Category = EWeaponCategory::WC_NONE;
 	}
@@ -66,7 +66,8 @@ class MYPROJECT_API AWeaponBase : public AItemBase
 	GENERATED_BODY()
 
 	AWeaponBase();
-	FTimerHandle Delay;	
+	FTimerHandle Delay;
+	FTimerHandle ShotStopper;
 
 public:
 
@@ -75,6 +76,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup")
 	class UAnimMontage* FireAnim;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup")
+	UAnimMontage* ReloadAnim;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup")
+	class USoundCue* FireSound;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Setup")
 	TSubclassOf<AItemBase> InventoryItem;
@@ -86,6 +93,15 @@ public:
 	FWeaponStats Stats;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Setup")
+	int32 Clip;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Setup")
+	int32 ReserveAmmo;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Setup")
+	int32 Range = 20000;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Setup")
 	class USkeletalMeshComponent* Appearance;
 
 	bool bCanFire = true;
@@ -93,6 +109,8 @@ public:
 	// Methods	
 	void StartFire();
 	void StopFire();
+	void Reload();
+	void DelayHandler();
 
-	void ResetFire();
+	void ResetAnim();
 };
