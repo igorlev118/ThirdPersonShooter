@@ -63,7 +63,11 @@ class MYPROJECT_API AWeaponBase : public AItemBase
 
 	AWeaponBase();
 
-public:	
+
+public:
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TSubclassOf<AItemBase> InventoryItem;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	FName WeaponDataBaseID;	

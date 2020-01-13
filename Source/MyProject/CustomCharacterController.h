@@ -80,10 +80,10 @@ protected:
 
 	void BeginPlay() override;
 
-public:
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	TSubclassOf<class AInventory> Inventory;
+
+public:	
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	AInventory* InventoryReference;
